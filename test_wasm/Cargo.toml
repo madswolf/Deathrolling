@@ -15,3 +15,4 @@ rand = "0.8"
 getrandom = { version = "0.2", features = ["js"] }
 wasm-bindgen-futures = "0.4"
 yew-hooks = "0.1.56"
+dotenv_codegen = "0.15.0"
