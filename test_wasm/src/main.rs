@@ -1,6 +1,5 @@
 use yew::prelude::*;
-use web_sys::{HtmlInputElement, EventTarget};
-use wasm_bindgen::JsCast;
+use web_sys::{HtmlInputElement};
 use rand::Rng;
 use yew_hooks::*;
 
@@ -9,44 +8,34 @@ struct Model {
     intensity: i64
 }
 
+fn roll(state:&UseStateHandle<Model>, sound:&UseMediaHandle, input_ref:&NodeRef){
+    let input = input_ref.cast::<HtmlInputElement>().unwrap();
+    let mut state_value = state.value;
+    let mut state_intensity = state.intensity;
+    let value = input.value().parse::<i64>();
 
-fn to_html_input_element(target:Option<EventTarget>) -> HtmlInputElement{
-    target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok()).unwrap()
-}
-
-#[macro_export]
-macro_rules!  rollMacro  {
-    ($state:expr, $sound: expr, $input_ref:expr) => {
-        let input = $input_ref.cast::<HtmlInputElement>().unwrap();
-        let mut state_value = $state.value;
-        let mut state_intensity = $state.intensity;
-        let value = input.value().parse::<i64>();
-
-        if let Ok(value) = value {
-            if value != state_value  {
-                state_value = value;
-                state_intensity = 1;
-            }
-        }
-
-        let num = rand::thread_rng().gen::<f64>();
-        let roll = (num * state_value as f64).ceil() as i64;
-        
-        let state_value = roll;
-        if roll == 1 {
-            $sound.play();
+    if let Ok(value) = value {
+        if value != state_value  {
+            state_value = value;
             state_intensity = 1;
-            log::info!("donorono");
-        } else {
-            state_intensity = state_intensity +1;
-            log::info!("gaming intensity: {:?} ", state_intensity);
         }
+    }
+
+    let num = rand::thread_rng().gen::<f64>();
+    let roll = (num * state_value as f64).ceil() as i64;
     
-        $state.set(Model {
-            value: state_value,
-            intensity: state_intensity
-        });
-    };
+    let state_value = roll;
+    if roll == 1 {
+        sound.play();
+        state_intensity = 1;
+    } else {
+        state_intensity = state_intensity + 1;
+    }
+
+    state.set(Model {
+        value: state_value,
+        intensity: state_intensity
+    });
 }
 
 #[function_component(App)]
@@ -57,18 +46,15 @@ fn app() -> Html {
     });
 
     let node_video = use_node_ref();
-    let src = "https://media.clown.mads.monster/bass2.mp3";
+    let src = dotenv_codegen::dotenv!("LOSS_SOUND_EFFECT_URL");
     let sound = use_media(node_video.clone(), src.to_owned());
-
     let input_ref = use_node_ref();
-
-
     let onclick = {
         let state = state.clone();
         let sound = sound.clone();
         let input_ref = input_ref.clone();
-        Callback::from(move |event:MouseEvent| {
-            rollMacro!(state, sound, input_ref);
+        Callback::from(move |_| {
+            roll(&state, &sound, &input_ref);
         })
     };
 
@@ -76,10 +62,9 @@ fn app() -> Html {
         let state = state.clone();
         let sound = sound.clone();
         let input_ref = input_ref.clone();
-
         Callback::from(move |event: KeyboardEvent| {
             if event.key() == "Enter" {
-                rollMacro!(state, sound, input_ref);
+                roll(&state, &sound, &input_ref);
             }
         })
     };
