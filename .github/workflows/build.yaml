@@ -8,12 +8,6 @@ jobs:
     name: Rust project
     runs-on: ubuntu-latest
     steps:
-      - name: Make envfile
-        uses: SpicyPizza/create-envfile@v1.3
-        with:
-          envkey_LOSS_SOUND_EFFECT_URL: ${{ secrets.LOSS_SOUND_EFFECT_URL }}
-          file_name: .env
-          fail_on_empty: false
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -22,5 +16,6 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         with:
+          LOSS_SOUND_EFFECT_URL: ${{ secrets.LOSS_SOUND_EFFECT_URL }}
           command: build
           args: --target wasm32-unknown-unknown
