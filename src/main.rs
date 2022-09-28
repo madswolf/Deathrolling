@@ -81,7 +81,7 @@ fn app() -> Html {
         <body class={if state.value == 1 {classes!("background")} else {classes!()}}>
             <input ref={input_ref} onkeydown={keydown} value={state.value.to_string()}/>
             <div class="flexbox" onclick={onclick}>
-                <audio ref={node_audio}/>
+                <audio ref={node_audio} preload="auto"/>
                 <p class={if state.value == 1 {classes!("result","one")} else {classes!("result")}} style={format!("color:red;font-size: {:?}px;",20 * state.intensity)}>{state.value}</p>
             </div>  
         </body>

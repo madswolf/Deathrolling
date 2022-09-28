@@ -16,6 +16,7 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         with:
-          LOSS_SOUND_EFFECT_URL: ${{ secrets.LOSS_SOUND_EFFECT_URL }}
           command: build
           args: --target wasm32-unknown-unknown
+        env:
+          LOSS_SOUND_EFFECT_URL: ${{ secrets.LOSS_SOUND_EFFECT_URL }}
