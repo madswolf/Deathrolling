@@ -2,6 +2,7 @@ use yew::prelude::*;
 use web_sys::{HtmlInputElement};
 use rand::Rng;
 use yew_hooks::*;
+use std::env;
 
 struct Model {
     value: i64,
@@ -51,7 +52,7 @@ fn app() -> Html {
     });
 
     let node_audio = use_node_ref();
-    let src = dotenv_codegen::dotenv!("LOSS_SOUND_EFFECT_URL");
+    let src = env!("LOSS_SOUND_EFFECT_URL");
     let sound = use_media(node_audio.clone(), src.to_owned());
     let input_ref = use_node_ref();
 
