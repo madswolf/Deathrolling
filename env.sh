@@ -1,0 +1,1 @@
+$env:LOSS_SOUND_EFFECT_URL="https://media.clown.mads.monster/bass2.mp3"
