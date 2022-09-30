@@ -2,7 +2,6 @@ use yew::prelude::*;
 use web_sys::{HtmlInputElement};
 use rand::{Rng, seq::SliceRandom};
 use yew_hooks::*;
-use std::env;
 
 #[derive(Eq, PartialEq, Clone)]
 struct Colors {
@@ -54,8 +53,16 @@ fn roll(state:&UseStateHandle<Model>, sound:&UseMediaHandle, input_ref:&NodeRef)
         state_intensity = state_intensity + 1;
     }
     
-    let thing = backgrounds.iter().cloned().filter(|x|  {x.clone() != state.colors}).collect::<Vec<_>>();
-    let Colors{background:mut background_color, result: result_color} = thing.choose(&mut rand::thread_rng()).unwrap().to_owned();
+    let Colors{background:mut background_color, result: result_color} = 
+        backgrounds
+        .iter()
+        .cloned()
+        .filter(|x|  {x.clone() != state.colors})
+        .collect::<Vec<_>>()
+        .choose(&mut rand::thread_rng())
+        .unwrap()
+        .to_owned();
+
     log::info!("background_color:{} result_color:{}", background_color, result_color);
 
     if state_value == 31 {
@@ -78,7 +85,7 @@ fn app() -> Html {
     });
 
     let node_audio = use_node_ref();
-    let src = env!("LOSS_SOUND_EFFECT_URL");
+    let src = dotenv_codegen::dotenv!("LOSS_SOUND_EFFECT_URL");
     let sound = use_media(node_audio.clone(), src.to_owned());
     let input_ref = use_node_ref();
 
@@ -86,7 +93,7 @@ fn app() -> Html {
         let state = state.clone();
         let sound = sound.clone();
         let input_ref = input_ref.clone();
-        Callback::from(move |_| {
+        Callback::from(move |_:MouseEvent| {
             roll(&state, &sound, &input_ref);
         })
     };
@@ -102,13 +109,17 @@ fn app() -> Html {
         })
     };
 
+    let body_classes = if state.value == 1 {classes!("background")} else {classes!()};
+    let body_style = format!("background-color: {};", state.colors.background);
+
+    let input_classes = if state.value == 1 {classes!("result","one")} else {classes!("result")};
+    let input_style = format!("color:{};font-size: {:?}px;",state.colors.result, 20 * state.intensity + 30);
 
     html!{
-        <body style={format!("background-color: {};", state.colors.background)} class={if state.value == 1 {classes!("background")} else {classes!()}}>
-            <input ref={input_ref} onkeydown={keydown} value={state.value.to_string()}/>
+        <body style={body_style} class={body_classes}>
             <div class="flexbox" onclick={onclick}>
+                <input class={input_classes} style={input_style} ref={input_ref} onkeydown={keydown} value={state.value.to_string()}/>
                 <audio ref={node_audio} preload="auto"/>
-                <p class={if state.value == 1 {classes!("result","one")} else {classes!("result")}} style={format!("color:{};font-size: {:?}px;",state.colors.result, 20 * state.intensity + 30)}>{state.value}</p>
             </div>  
         </body>
     }
