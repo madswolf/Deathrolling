@@ -14,18 +14,24 @@ struct Model<'a> {
     intensity: i64,
     colors: Colors<'a>
 }
+impl<'a> Colors<'a> {
+    pub const fn new(background:&'a str, result:&'a str) -> Self{
+        Self {background, result}
+    }
+}
+
+const BACKGROUNDS: &'static [Colors] = &[
+    Colors::new("#52AA5E", "#007991"),
+    Colors::new("#F3DE8A", "#2A2B2A"),
+    Colors::new("#EB9486", "#233D4D"),
+    Colors::new("#5299D3", "#F2DFD7"),
+    Colors::new("#FEE1C7", "#684E32")
+];
+
 
 
 fn roll(state:&UseStateHandle<Model>, sound:&UseMediaHandle, input_ref:&NodeRef){
     let input = input_ref.cast::<HtmlInputElement>().unwrap();
-
-    let backgrounds:Vec<Colors> = vec![
-        Colors{background:"#52AA5E", result:"#007991"},
-        Colors{background:"#F3DE8A", result:"#2A2B2A"},
-        Colors{background:"#EB9486", result:"#233D4D"},
-        Colors{background:"#5299D3", result:"#F2DFD7"},
-        Colors{background:"#FEE1C7", result:"#684E32"}
-    ];
 
     let mut state_value = state.value;
     let mut state_intensity = state.intensity;
@@ -54,7 +60,7 @@ fn roll(state:&UseStateHandle<Model>, sound:&UseMediaHandle, input_ref:&NodeRef)
     }
     
     let Colors{background:mut background_color, result: result_color} = 
-        backgrounds
+        BACKGROUNDS
         .iter()
         .cloned()
         .filter(|x|  {x.clone() != state.colors})
@@ -81,7 +87,7 @@ fn app() -> Html {
     let state = use_state(|| Model {
         value: 69,
         intensity: 1,
-        colors:Colors{background:"#52AA5E", result:"red"}
+        colors:BACKGROUNDS.first().unwrap().to_owned()
     });
 
     let node_audio = use_node_ref();
@@ -109,16 +115,16 @@ fn app() -> Html {
         })
     };
 
-    let body_classes = if state.value == 1 {classes!("background")} else {classes!()};
+    let body_classes = if state.value == 1 {classes!("shake")} else {classes!()};
     let body_style = format!("background-color: {};", state.colors.background);
 
-    let input_classes = if state.value == 1 {classes!("result","one")} else {classes!("result")};
+    let input_classes = if state.value == 1 {classes!("one")} else {classes!()};
     let input_style = format!("color:{};font-size: {:?}px;",state.colors.result, 20 * state.intensity + 30);
 
     html!{
         <body style={body_style} class={body_classes}>
             <div class="flexbox" onclick={onclick}>
-                <input class={input_classes} style={input_style} ref={input_ref} onkeydown={keydown} value={state.value.to_string()}/>
+                <input type="number" class={input_classes} style={input_style} ref={input_ref} onkeydown={keydown} value={state.value.to_string()}/>
                 <audio ref={node_audio} preload="auto"/>
             </div>  
         </body>

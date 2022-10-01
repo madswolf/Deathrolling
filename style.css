@@ -14,6 +14,16 @@ input {
   cursor:default;
   width: 100%;
   text-align: center;
+  line-height: 1em;
+  font-weight: bold;
+  -moz-appearance: textfield;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+     -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently
+                                supported by Chrome, Edge, Opera and Firefox */
 }
 
 .flexbox{
@@ -23,26 +33,13 @@ input {
     align-items: center;
 }
 
-
-.result {
-    line-height: 1em;
-    font-weight: bold;
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
-}
-
 .one{
   animation: shake 0.2s;
   animation-iteration-count: 4;
 }
 
 
-.background{
+.shake{
     animation: background-colorChange 0.2s;
     animation-iteration-count: 4;
 }
