@@ -4,15 +4,15 @@ use rand::{Rng, seq::SliceRandom};
 use yew_hooks::*;
 
 #[derive(Eq, PartialEq, Clone)]
-struct Colors {
-    background: String,
-    result: String
+struct Colors<'a> {
+    background: &'a str,
+    result: &'a str
 }
 
-struct Model {
+struct Model<'a> {
     value: i64,
     intensity: i64,
-    colors: Colors
+    colors: Colors<'a>
 }
 
 
@@ -20,11 +20,11 @@ fn roll(state:&UseStateHandle<Model>, sound:&UseMediaHandle, input_ref:&NodeRef)
     let input = input_ref.cast::<HtmlInputElement>().unwrap();
 
     let backgrounds:Vec<Colors> = vec![
-        Colors{background:"#52AA5E".to_owned(),result:"#007991".to_owned()},
-        Colors{background:"#F3DE8A".to_owned(),result:"#2A2B2A".to_owned()},
-        Colors{background:"#EB9486".to_owned(),result:"#233D4D".to_owned()},
-        Colors{background:"#5299D3".to_owned(),result:"#F2DFD7".to_owned()},
-        Colors{background:"#FEE1C7".to_owned(),result:"#684E32".to_owned()}
+        Colors{background:"#52AA5E", result:"#007991"},
+        Colors{background:"#F3DE8A", result:"#2A2B2A"},
+        Colors{background:"#EB9486", result:"#233D4D"},
+        Colors{background:"#5299D3", result:"#F2DFD7"},
+        Colors{background:"#FEE1C7", result:"#684E32"}
     ];
 
     let mut state_value = state.value;
@@ -66,7 +66,7 @@ fn roll(state:&UseStateHandle<Model>, sound:&UseMediaHandle, input_ref:&NodeRef)
     log::info!("background_color:{} result_color:{}", background_color, result_color);
 
     if state_value == 31 {
-        background_color = "#5d198a".to_owned();
+        background_color = "#5d198a";
     }
 
     state.set(Model {
@@ -81,7 +81,7 @@ fn app() -> Html {
     let state = use_state(|| Model {
         value: 69,
         intensity: 1,
-        colors:Colors{background:"#52AA5E".to_owned(), result:"red".to_owned()}
+        colors:Colors{background:"#52AA5E", result:"red"}
     });
 
     let node_audio = use_node_ref();
