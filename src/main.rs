@@ -3,7 +3,7 @@ use web_sys::{HtmlInputElement};
 use rand::{Rng, seq::SliceRandom};
 use yew_hooks::*;
 
-#[derive(Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 struct Colors<'a> {
     background: &'a str,
     result: &'a str
@@ -21,45 +21,44 @@ impl<'a> Colors<'a> {
 }
 
 const BACKGROUNDS: &'static [Colors] = &[
-    Colors::new("#52AA5E", "#007991"),
+    Colors::new("#402E2A", "#FFA62B"),
     Colors::new("#F3DE8A", "#2A2B2A"),
     Colors::new("#EB9486", "#233D4D"),
     Colors::new("#5299D3", "#F2DFD7"),
     Colors::new("#FEE1C7", "#684E32")
 ];
 
+fn parse_or_default(state:&UseStateHandle<Model>, input_ref:&NodeRef) -> (i64,i64) {
+    return input_ref
+        .cast::<HtmlInputElement>()
+        .unwrap()
+        .value()
+        .parse::<i64>()
+        .map_or_else(
+        |_| (state.value, state.intensity), //default 
+         |x| (num::clamp(x, 1, std::i64::MAX),1)) //happy path
+}
 
 
 fn roll(state:&UseStateHandle<Model>, sound:&UseMediaHandle, input_ref:&NodeRef){
-    let input = input_ref.cast::<HtmlInputElement>().unwrap();
 
-    let mut state_value = state.value;
-    let mut state_intensity = state.intensity;
-    let value = input.value().parse::<i64>();
+    let (parsed_value, post_parse_intensity) = parse_or_default(state, input_ref);
 
-    if let Ok(value) = value {
-        if value != state_value  {
-            state_value = num::clamp(value, 1, std::i64::MAX);
-            state_intensity = 1;
-        }
-    }
-
-    if state_value == 1 {
+    if parsed_value == 1 {
         return
     }
 
-    let num = rand::thread_rng().gen::<f64>();
-    let roll = (num * state_value as f64).ceil() as i64;
-    
-    let state_value = roll;
-    if roll == 1 {
-        sound.play();
-        state_intensity = 1;
-    } else {
-        state_intensity = state_intensity + 1;
-    }
-    
-    let Colors{background:mut background_color, result: result_color} = 
+    let (new_value, new_intensity) = {
+        let roll = (rand::thread_rng().gen::<f64>() * parsed_value as f64).ceil() as i64;
+        if roll == 1 {
+            sound.play();
+            (roll,1)
+        } else {
+            (roll, post_parse_intensity + 1)
+        }   
+    };
+
+    let color: Colors = if new_value != 31 {
         BACKGROUNDS
         .iter()
         .cloned()
@@ -67,18 +66,15 @@ fn roll(state:&UseStateHandle<Model>, sound:&UseMediaHandle, input_ref:&NodeRef)
         .collect::<Vec<_>>()
         .choose(&mut rand::thread_rng())
         .unwrap()
-        .to_owned();
-
-    log::info!("background_color:{} result_color:{}", background_color, result_color);
-
-    if state_value == 31 {
-        background_color = "#5d198a";
-    }
+        .to_owned()
+    } else {
+        Colors::new("#5d198a","#CDC392")
+    };
 
     state.set(Model {
-        value: state_value,
-        intensity: state_intensity,
-        colors:Colors{background:background_color, result: result_color}
+        value: new_value,
+        intensity: new_intensity,
+        colors:color
     });
 }
 
