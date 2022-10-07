@@ -1,7 +1,9 @@
+use log::logger;
 use yew::prelude::*;
 use web_sys::{HtmlInputElement};
 use rand::{Rng, seq::SliceRandom};
 use yew_hooks::*;
+use regex::Regex;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 struct Colors<'a> {
@@ -28,6 +30,8 @@ const BACKGROUNDS: &'static [Colors] = &[
     Colors::new("#FEE1C7", "#684E32")
 ];
 
+const numberPattern: &'static str = &"[0-9]";
+
 fn parse_or_default(state:&UseStateHandle<Model>, input_ref:&NodeRef) -> (i64,i64) {
     return input_ref
         .cast::<HtmlInputElement>()
@@ -36,7 +40,13 @@ fn parse_or_default(state:&UseStateHandle<Model>, input_ref:&NodeRef) -> (i64,i6
         .parse::<i64>()
         .map_or_else(
         |_| (state.value, state.intensity), //default 
-         |x| (num::clamp(x, 1, std::i64::MAX),1)) //happy path
+         |x| {
+                if x != state.value {
+                   (num::clamp(x, 1, std::i64::MAX),1)
+                } else {
+                   (state.value, state.intensity)
+                }
+            }) //happy path
 }
 
 
@@ -100,13 +110,17 @@ fn app() -> Html {
         })
     };
 
+    let pattern = Regex::new(numberPattern).unwrap();
+
     let keydown = {
         let state = state.clone();
         let sound = sound.clone();
         let input_ref = input_ref.clone();
         Callback::from(move |event: KeyboardEvent| {
-            if event.key() == "Enter" {
+            if event.key() == "Enter"  {
                 roll(&state, &sound, &input_ref);
+            } else if !pattern.is_match(&event.key()) {
+                event.prevent_default();
             }
         })
     };
@@ -116,6 +130,7 @@ fn app() -> Html {
 
     let input_classes = if state.value == 1 {classes!("one")} else {classes!()};
     let input_style = format!("color:{};font-size: {:?}px;",state.colors.result, 20 * state.intensity + 30);
+
 
     html!{
         <body style={body_style} class={body_classes}>
