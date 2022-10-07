@@ -106,7 +106,15 @@ fn app() -> Html {
         let sound = sound.clone();
         let input_ref = input_ref.clone();
         Callback::from(move |_:MouseEvent| {
-            roll(&state, &sound, &input_ref);
+            if state.value != 1 {
+                roll(&state, &sound, &input_ref);
+            } else {
+                state.set(Model {
+                    value: 69,
+                    intensity: 1,
+                    colors:BACKGROUNDS.first().unwrap().to_owned()
+                });
+            }
         })
     };
 
@@ -119,7 +127,7 @@ fn app() -> Html {
         Callback::from(move |event: KeyboardEvent| {
             if event.key() == "Enter"  {
                 roll(&state, &sound, &input_ref);
-            } else if !pattern.is_match(&event.key()) {
+            } else if !pattern.is_match(&event.key()) && event.key() != "Backspace"{
                 event.prevent_default();
             }
         })
