@@ -1,0 +1,64 @@
+html, body{
+  margin: 0%;
+  height: 100%;
+  overflow: hidden;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  display: none;
+}
+
+input {
+  background-color: transparent;
+  opacity: 1;
+  transform: 0;
+  transition: all 1s;
+  border: 0px;
+  outline: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  cursor:default;
+  width: 100%;
+  text-align: center;
+  line-height: 1em;
+  font-weight: bold;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+     -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently
+                                supported by Chrome, Edge, Opera and Firefox */
+}
+
+.flexbox{
+    height: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.one{
+  opacity: 0;
+  transform: translate(0, 0) rotate(0deg);
+  animation: shake 0.2s;
+  animation-iteration-count: 4;
+}
+
+@keyframes shake {
+  0% { transform: translate(0.08em, 0.08em) rotate(0deg);}
+  10% { transform: translate(-0.08em, -0.16em) rotate(-1deg); }
+  20% { transform: translate(-0.24em, 0) rotate(1deg); }
+  30% { transform: translate(0.24em, 0.16em) rotate(0deg); }
+  40% { transform: translate(0.08em, -0.08em) rotate(1deg); }
+  50% { transform: translate(-0.08em, 0.16em) rotate(-1deg); }
+  60% { transform: translate(-0.24em, 0.08em) rotate(0deg); }
+  70% { transform: translate(0.24em, 0.08em) rotate(-1deg); }
+  80% { transform: translate(-0.08em, -0.08em) rotate(1deg); }
+  90% { transform: translate(0.08em, 0.16em) rotate(0deg); }
+  100% { transform: translate(0.08em, -0.16em) rotate(-1deg);}
+}
